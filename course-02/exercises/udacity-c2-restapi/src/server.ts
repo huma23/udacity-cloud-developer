@@ -1,10 +1,10 @@
+import * as dotenv from 'dotenv' // see https://github.com/motdotla/dotenv#how-do-i-use-dotenv-with-import
+dotenv.config()
+
 import express from 'express';
 import { sequelize } from './sequelize';
-
 import { IndexRouter } from './controllers/v0/index.router';
-
 import bodyParser from 'body-parser';
-
 import { V0MODELS } from './controllers/v0/model.index';
 
 (async () => {
