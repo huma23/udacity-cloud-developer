@@ -1,5 +1,4 @@
 import isUrl from 'is-url';
-import isImage from 'is-image'
 import { Router, Request, Response, response } from "express";
 import { deleteLocalFiles } from "../../../../util/util";
 import { filterImageFromURL } from "../../../../util/util";
@@ -23,7 +22,7 @@ const router: Router = Router();
 
   //! END @TODO1
 
-router.use('/',async (req: Request, res: Response) => {
+router.use('/filteredimage',async (req: Request, res: Response) => {
 
     const bad_request = {message: 'Bad request: Try GET /api/v0/filteredimage?image_url={{URL}}'};
 
