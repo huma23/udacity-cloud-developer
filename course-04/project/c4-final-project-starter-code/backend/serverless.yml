@@ -132,6 +132,7 @@ functions:
           path: todos/{todoId}/attachment
           cors: true
           authorizer: Auth
+    iamRoleStatementsInherit: true
     iamRoleStatements:
       - Effect: Allow
         Action:
