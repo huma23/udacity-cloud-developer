@@ -7,12 +7,21 @@ import httpErrorHandler from '@middy/http-error-handler'
 
 import { updateTodo } from '../../businessLogic/todos'
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
+import { getUserId } from '../utils'
+import { createLogger } from '../../utils/logger'
+
+const logger = createLogger('PATCH todos')
 
 export const handler = middy(
   async (event: APIGatewayProxyEvent): Promise<APIGatewayProxyResult> => {
     const todoId = event.pathParameters.todoId
+    logger.info('todoId', todoId)
+    const userId = getUserId(event)
+    logger.info('userId', userId)
     const request: UpdateTodoRequest = JSON.parse(event.body)
-    updateTodo(todoId, request)
+    logger.info('request', request)
+
+    await updateTodo(userId, todoId, request)
 
     return {
       statusCode: 204,

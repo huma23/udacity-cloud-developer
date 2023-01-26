@@ -1,12 +1,16 @@
 import * as AWS from "aws-sdk";
+import * as AWSXRAY from "aws-xray-sdk"
+
 import { DocumentClient } from "aws-sdk/clients/dynamodb";
 import { TodoItem } from "../models/TodoItem";
 import { TodoUpdate } from "../models/TodoUpdate";
 
+const XAWS = AWSXRAY.captureAWS(AWS)
+
 export class TodosAccess {
 
     constructor(
-        private readonly docClient: DocumentClient = new AWS.DynamoDB.DocumentClient(),
+        private readonly docClient : DocumentClient = new XAWS.DynamoDB.DocumentClient(),
         private readonly todosTable = process.env.TODOS_TABLE,
         private readonly todosCreatedAtIndex = process.env.TODOS_CREATED_AT_INDEX
     ){}
@@ -34,26 +38,40 @@ export class TodosAccess {
         return todoItem
     }
 
-    async updateTodo(todoId: string, updates: TodoUpdate): Promise<void> {
+    async updateTodo(userid: string, todoId: string, updates: TodoUpdate): Promise<void> {
         await this.docClient.update({
             TableName: this.todosTable,
             Key: {
+                userId: userid,
                 todoId: todoId
             },
-            UpdateExpression: 'set name = :name, dueDate = :dueDate, done = :done',
+            UpdateExpression: 'set done = :done',
             ExpressionAttributeValues:{
-                ':name': updates.name,
-                ':dueDate': updates.dueDate,
                 ':done': updates.done
             }
         }).promise()
     }
 
-    async deleteTodo(todoId: string): Promise<void> {
+    async updateTodoUrl(userid: string, todoId: string, url: string): Promise<void> {
+        await this.docClient.update({
+            TableName: this.todosTable,
+            Key: {
+                userId: userid,
+                todoId: todoId
+            },
+            UpdateExpression: 'set attachmentUrl = :url',
+            ExpressionAttributeValues:{
+                ':url': url
+            }
+        }).promise()
+    }
+
+    async deleteTodo(userId: string, todoId: string): Promise<void> {
         await this.docClient.delete({
             TableName: this.todosTable,
             Key: {
-                todoId: todoId
+                todoId: todoId,
+                userId: userId
             }
         }).promise();
     }
