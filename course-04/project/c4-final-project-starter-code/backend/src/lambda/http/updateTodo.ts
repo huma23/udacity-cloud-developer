@@ -9,6 +9,7 @@ import { updateTodo } from '../../businessLogic/todos'
 import { UpdateTodoRequest } from '../../requests/UpdateTodoRequest'
 import { getUserId } from '../utils'
 import { createLogger } from '../../utils/logger'
+import { ValidationError } from '../../utils/validationError'
 
 const logger = createLogger('PATCH todos')
 
@@ -21,11 +22,25 @@ export const handler = middy(
     const request: UpdateTodoRequest = JSON.parse(event.body)
     logger.info('request', request)
 
-    await updateTodo(userId, todoId, request)
+    try {
+      await updateTodo(userId, todoId, request)
 
-    return {
-      statusCode: 204,
-      body: ""
+      return {
+        statusCode: 204,
+        body: ""
+      }
+    } catch (exception) {
+      if(exception instanceof ValidationError){
+        return {
+          statusCode: 400,
+          body: JSON.stringify({error: exception.message})
+        }
+      }
+
+      return {
+        statusCode: 500,
+        body: JSON.stringify({error: exception})
+      }
     }
   })
 
